@@ -123,7 +123,7 @@ PayTR API ← Token Generation ← Order Processing
 
 1. **Projeyi klonlayın**
 ```bash
-git clone https://github.com/yourusername/megaototuning.git
+git clone https://github.com/yasinkrcm/megaototuning.git
 cd megaototuning
 ```
 
@@ -189,8 +189,8 @@ npm run update-users
 **Yasin KARAÇAM** - Full Stack Developer & Freelancer
 
 ### 💼 Profesyonel Deneyim
-- **5+ yıl** web geliştirme deneyimi
-- **Modern JavaScript** ekosistemi uzmanı
+- **3+ yıl** web geliştirme deneyimi
+- **Modern JavaScript** ekosistemi 
 - **E-ticaret** ve **fintech** projelerinde uzmanlaşma
 - **API entegrasyonları** ve **ödeme sistemleri** konusunda deneyim
 
@@ -213,8 +213,8 @@ npm run update-users
 ## 📞 Destek / İletişim
 
 **📧 E-posta**: yasinkaracam67@gmail.com  
-**💼 LinkedIn**: [Yasin KARAÇAM](https://linkedin.com/in/yasinkaracam)  
-**🐙 GitHub**: [@yasinkaracam](https://github.com/yasinkaracam)
+**💼 LinkedIn**: [Yasin KARAÇAM](https://linkedin.com/in/yasinkaracamm)  
+**🐙 GitHub**: [@yasinkaracam](https://github.com/yasinkrcm)
 
 ### 🤝 İş Birliği
 - Freelance projeler için uygun
@@ -228,6 +228,6 @@ npm run update-users
 
 **⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!**
 
-Made with ❤️ by [Yasin KARAÇAM](https://github.com/yasinkaracam)
+Made with ❤️ by [Yasin KARAÇAM](https://github.com/yasinkrcm)
 
 </div>
