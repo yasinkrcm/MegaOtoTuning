@@ -213,8 +213,8 @@ npm run update-users
 ## 📞 Destek / İletişim
 
 **📧 E-posta**: yasinkaracam67@gmail.com  
-**💼 LinkedIn**: [Yasin KARAÇAM](https://linkedin.com/in/yasinkaracamm)  
-**🐙 GitHub**: [@yasinkaracam](https://github.com/yasinkrcm)
+**💼 LinkedIn**: [Yasin KARAÇAM](https://linkedin.com/in/yasin-karacamm)  
+**🐙 GitHub**: [@yasinkrcm](https://github.com/yasinkrcm)
 
 ### 🤝 İş Birliği
 - Freelance projeler için uygun
