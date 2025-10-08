@@ -40,7 +40,7 @@ export default function SalesPolicyPage() {
 
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Ödeme Seçenekleri</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div cl assName="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <h3 className="text-lg font-bold text-gray-900 mb-3">Online Ödeme</h3>
                   <ul className="text-sm text-gray-600 space-y-2">
@@ -50,14 +50,6 @@ export default function SalesPolicyPage() {
                   </ul>
                 </div>
                 
-                <div className="bg-gray-50 p-6 rounded-lg">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Kapıda Ödeme</h3>
-                  <ul className="text-sm text-gray-600 space-y-2">
-                    <li>• Nakit ödeme</li>
-                    <li>• Ek ücret: 15 TL</li>
-                    <li>• Maksimum tutar: 1000 TL</li>
-                  </ul>
-                </div>
               </div>
             </section>
 

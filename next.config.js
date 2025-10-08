@@ -17,7 +17,7 @@ const nextConfig = {
   // Prevent 500 errors on missing environment variables
   env: {
     MONGODB_URI: process.env.MONGODB_URI || '',
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3001'
   }
 };
 

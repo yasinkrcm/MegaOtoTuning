@@ -12,7 +12,7 @@ export default function DistanceSalesAgreementPage() {
                 <p className="text-gray-700 mb-4">
                   <strong>SATICI:</strong><br />
                   <strong>Ünvan:</strong> Mega Oto Tuning<br />
-                  <strong>Adres:</strong> Örnek Mahallesi, Tuning Caddesi No:123, 34000 İstanbul<br />
+                  <strong>Adres:</strong> Keban Merkez Sanayi Sitesi, A Blok No: 10, Elazığ, Türkiye<br />
                   <strong>Telefon:</strong> +90 512 345 6789<br />
                   <strong>E-posta:</strong> info@megaototuning.com<br />
                   <strong>Web Sitesi:</strong> www.megaototuning.com
