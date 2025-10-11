@@ -35,6 +35,18 @@ export async function POST(request) {
     const merchant_key = process.env.PAYTR_MERCHANT_KEY;
     const merchant_salt = process.env.PAYTR_MERCHANT_SALT;
 
+    // Environment variables kontrolü
+    if (!merchant_id || !merchant_key || !merchant_salt) {
+      console.error('PayTR environment variables eksik:', {
+        merchant_id: !!merchant_id,
+        merchant_key: !!merchant_key,
+        merchant_salt: !!merchant_salt
+      });
+      return NextResponse.json({ 
+        error: 'PayTR ayarları yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.' 
+      }, { status: 500 });
+    }
+
     // Önce siparişi oluştur
     await connectToDatabase();
     const order = await Order.create({
