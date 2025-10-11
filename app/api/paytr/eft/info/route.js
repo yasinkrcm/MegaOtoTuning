@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { connectToDatabase } from '../../../../lib/mongodb';
-import Order from '../../../../lib/models/order';
+import { connectToDatabase } from '../../../../../lib/mongodb';
+import Order from '../../../../../lib/models/order';
 
+/**
+ * PayTR EFT Ara Bildirim Endpoint'i
+ * Müşteri bildirim formunu doldurduğunda PayTR bu endpoint'e bilgi gönderir
+ */
 export async function POST(request) {
   try {
     let callback = {};
@@ -31,46 +35,35 @@ export async function POST(request) {
     }
 
     // Hash doğrulaması yap
-    // Hash string: merchant_oid + merchant_salt + status + total_amount
-    const hashString = callback.merchant_oid + merchant_salt + callback.status + callback.total_amount;
+    // Ara bildirim için hash: merchant_oid + bank + merchant_salt
+    const hashString = callback.merchant_oid + callback.bank + merchant_salt;
     const calculatedHash = crypto.createHmac('sha256', merchant_key)
       .update(hashString)
       .digest('base64');
 
     if (calculatedHash !== callback.hash) {
-      console.error('PayTR hash doğrulaması başarısız!');
+      console.error('PayTR ara bildirim hash doğrulaması başarısız!');
       return new NextResponse("OK", { status: 200, headers: { "Content-Type": "text/plain" } });
     }
 
-    // Veritabanına bağlan
+    // Veritabanına bağlan ve siparişi güncelle
     await connectToDatabase();
-
-    // Siparişi bul
+    
     const order = await Order.findById(callback.merchant_oid);
 
-    if (!order) {
-      console.error('Sipariş bulunamadı:', callback.merchant_oid);
-      return new NextResponse("OK", { status: 200, headers: { "Content-Type": "text/plain" } });
-    }
+    if (order) {
+      // Ara bildirim bilgilerini sipariş notuna ekle
+      const infoNote = `
+EFT/Havale Bildirim Bilgileri:
+- Banka: ${callback.bank || '-'}
+- Gönderen: ${callback.user_name || '-'}
+- Telefon: ${callback.user_phone || '-'}
+- Gönderim Tarihi: ${callback.payment_sent_date || '-'}
+- TC Son 5 Hane: ${callback.tc_no_last5 || '-'}
+      `.trim();
 
-    // Sipariş durumu zaten güncellenmişse tekrar güncelleme
-    if (order.status === 'onaylandı' || order.status === 'iptal') {
-      return new NextResponse("OK", { status: 200, headers: { "Content-Type": "text/plain" } });
-    }
-
-    // Ödeme başarılı mı?
-    if (callback.status === 'success') {
-      // Siparişi onayla
-      order.status = 'onaylandı';
-      order.paytrStatus = 'success';
-      order.paytrTransactionId = callback.merchant_oid;
-      await order.save();
-    } else {
-      // Ödeme başarısız
-      order.status = 'iptal';
-      order.paytrStatus = 'failed';
-      order.paytrFailedReason = callback.failed_reason_msg || 'Bilinmeyen hata';
-      order.paytrFailedReasonCode = callback.failed_reason_code || '';
+      order.notes = order.notes ? `${order.notes}\n\n${infoNote}` : infoNote;
+      order.status = 'ödeme-bildirimi-yapıldı'; // Özel durum: bildirim yapıldı, onay bekleniyor
       await order.save();
     }
 
@@ -78,8 +71,8 @@ export async function POST(request) {
     return new NextResponse("OK", { status: 200, headers: { "Content-Type": "text/plain" } });
 
   } catch (error) {
-    console.error('PayTR callback error:', error);
-    // Hata durumunda bile OK döndür ki PayTR tekrar denemesin
+    console.error('PayTR ara bildirim error:', error);
+    // Hata durumunda bile OK döndür
     return new NextResponse("OK", { status: 200, headers: { "Content-Type": "text/plain" } });
   }
 }
@@ -94,3 +87,4 @@ export async function PUT() {
 export async function DELETE() {
   return new NextResponse("Method not allowed", { status: 405 });
 }
+

@@ -111,50 +111,8 @@ export default function CheckoutPage() {
         return;
       }
 
-      if (formData.paymentMethod === 'PayTR') {
-        // Önce sipariş oluştur
-        const orderData = {
-          userId: user._id || user.id,
-          customerName: formData.name,
-          items: cart.map(item => ({
-            productId: item.productId,
-            productName: item.productName,
-            imageUrl: item.imageUrl,
-            price: item.price,
-            quantity: item.quantity,
-            size: item.size
-          })),
-          totalAmount: totalPrice,
-          address: `${formData.address}, ${formData.city}, ${formData.zipCode}`,
-          phoneNumber: formData.phoneNumber,
-          notes: formData.notes,
-          paymentMethod: 'PayTR',
-          status: 'ödeme-bekliyor'
-        };
-
-        // Siparişi oluştur
-        const orderResponse = await authenticatedFetch('/api/orders', {
-          method: 'POST',
-          body: JSON.stringify(orderData)
-        });
-
-        if (!orderResponse.ok) {
-          throw new Error('Sipariş oluşturulamadı');
-        }
-
-        const { _id: orderId } = await orderResponse.json();
-
+      if (formData.paymentMethod === 'PayTR' || formData.paymentMethod === 'PayTR-EFT') {
         // PayTR ödeme işlemini başlat
-
-        // PayTR için sepet verilerini hazırla
-        const paytrBasket = cart.map(item => [
-          item.productName || '',
-          Math.round((item.price || 0) * 100).toString(), // PayTR kuruş cinsinden istiyor
-          item.quantity.toString()
-        ]);
-
-
-
         const paytrData = {
           items: cart.map(item => ({
             productId: item.productId,
@@ -172,13 +130,16 @@ export default function CheckoutPage() {
             address: `${formData.address}, ${formData.city}, ${formData.zipCode}`,
             email: user.email
           },
-          paymentMethod: 'PayTR',
+          paymentMethod: formData.paymentMethod,
           status: 'ödeme-bekliyor'
         };
 
+        // Endpoint seçimi: EFT mi yoksa Kredi Kartı mı?
+        const endpoint = formData.paymentMethod === 'PayTR-EFT' 
+          ? '/api/paytr/eft/create' 
+          : '/api/paytr/create';
 
-
-        const paytrResponse = await authenticatedFetch('/api/paytr/create', {
+        const paytrResponse = await authenticatedFetch(endpoint, {
           method: 'POST',
           body: JSON.stringify(paytrData)
         });
@@ -190,8 +151,6 @@ export default function CheckoutPage() {
         }
 
         const responseData = await paytrResponse.json();
-
-
         const { token } = responseData;
         
         // PayTR iframe'ini oluştur ve göster
@@ -208,7 +167,12 @@ export default function CheckoutPage() {
         iframeContainer.style.justifyContent = 'center';
 
         const iframe = document.createElement('iframe');
-        iframe.src = `https://www.paytr.com/odeme/guvenli/${token}`;
+        // EFT ve Kredi Kartı için farklı URL'ler
+        if (formData.paymentMethod === 'PayTR-EFT') {
+          iframe.src = `https://www.paytr.com/odeme/api/${token}`;
+        } else {
+          iframe.src = `https://www.paytr.com/odeme/guvenli/${token}`;
+        }
         iframe.style.width = '90%';
         iframe.style.height = '90%';
         iframe.style.border = 'none';
@@ -424,29 +388,46 @@ export default function CheckoutPage() {
                         className="h-4 w-4 text-pink-600 focus:ring-pink-500"
                       />
                       <label htmlFor="bank-transfer" className="ml-3 block text-sm font-medium text-gray-700">
-                        Banka Transferi
+                        Banka Transferi (Manuel)
                       </label>
                     </div>
 
-
-
                     {settings.paytrEnabled && (
-                      <div className="flex items-center">
-                        <input
-                          id="paytr"
-                          name="paymentMethod"
-                          type="radio"
-                          value="PayTR"
-                          checked={formData.paymentMethod === 'PayTR'}
-                          onChange={handleInputChange}
-                          className="h-4 w-4 text-pink-600 focus:ring-pink-500"
-                        />
-                        <label htmlFor="paytr" className="ml-3 flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-700">PayTR ile Güvenli Ödeme</span>
-                          <img src="https://www.paytr.com/wp-content/uploads/logo-1.png" alt="PayTR" className="h-2" />
-                          <span className="text-xs text-green-600">(3D Secure)</span>
-                        </label>
-                      </div>
+                      <>
+                        <div className="flex items-center">
+                          <input
+                            id="paytr"
+                            name="paymentMethod"
+                            type="radio"
+                            value="PayTR"
+                            checked={formData.paymentMethod === 'PayTR'}
+                            onChange={handleInputChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500"
+                          />
+                          <label htmlFor="paytr" className="ml-3 flex items-center space-x-2">
+                            <span className="text-sm font-medium text-gray-700">Kredi Kartı ile Ödeme</span>
+                            <img src="https://www.paytr.com/wp-content/uploads/logo-1.png" alt="PayTR" className="h-2" />
+                            <span className="text-xs text-green-600">(3D Secure)</span>
+                          </label>
+                        </div>
+
+                        <div className="flex items-center">
+                          <input
+                            id="paytr-eft"
+                            name="paymentMethod"
+                            type="radio"
+                            value="PayTR-EFT"
+                            checked={formData.paymentMethod === 'PayTR-EFT'}
+                            onChange={handleInputChange}
+                            className="h-4 w-4 text-pink-600 focus:ring-pink-500"
+                          />
+                          <label htmlFor="paytr-eft" className="ml-3 flex items-center space-x-2">
+                            <span className="text-sm font-medium text-gray-700">Havale/EFT Bildirimi</span>
+                            <img src="https://www.paytr.com/wp-content/uploads/logo-1.png" alt="PayTR" className="h-2" />
+                            <span className="text-xs text-blue-600">(Otomatik Onay)</span>
+                          </label>
+                        </div>
+                      </>
                     )}
                     
                     {formData.paymentMethod === 'Banka Transferi' && (
@@ -481,16 +462,22 @@ export default function CheckoutPage() {
                 
                 {/* Form gönder */}
                 <div className="bg-white p-6 border-t border-gray-200">
-                                      {formData.paymentMethod === 'PayTR' ? (
-                      <button
-                        type="button"
-                        onClick={handlePaymentClick}
-                        className="w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        PayTR ile Güvenli Ödeme Yap
-                      </button>
-
-                    ) : (
+                  {(formData.paymentMethod === 'PayTR' || formData.paymentMethod === 'PayTR-EFT') ? (
+                    <button
+                      type="button"
+                      onClick={handlePaymentClick}
+                      className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white ${
+                        formData.paymentMethod === 'PayTR-EFT'
+                          ? 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
+                          : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                      } focus:outline-none focus:ring-2 focus:ring-offset-2`}
+                    >
+                      {formData.paymentMethod === 'PayTR-EFT' 
+                        ? 'Havale/EFT Bildirimini Başlat' 
+                        : 'Kredi Kartı ile Ödeme Yap'}
+                    </button>
+                  ) : (
+                    <>
                       <div className="flex items-center mb-4">
                         <input
                           id="isPaid"
@@ -504,20 +491,19 @@ export default function CheckoutPage() {
                           Ödeme yaptım.
                         </label>
                       </div>
-                    )}
-                  
-                  {formData.paymentMethod !== 'PayTR' && (
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 ${
-                        loading
-                          ? 'opacity-50 cursor-not-allowed' 
-                          : 'hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500'
-                      }`}
-                    >
-                      {loading ? 'Sipariş Oluşturuluyor...' : 'Siparişi Tamamla'}
-                    </button>
+                      
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-pink-600 ${
+                          loading
+                            ? 'opacity-50 cursor-not-allowed' 
+                            : 'hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500'
+                        }`}
+                      >
+                        {loading ? 'Sipariş Oluşturuluyor...' : 'Siparişi Tamamla'}
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
