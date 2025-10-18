@@ -70,7 +70,7 @@ export default function Contact() {
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">Telefon</h3>
-                  <p className="text-gray-600">+90 512 345 6789</p>
+                  <p className="text-gray-600">+90 506 892 2453</p>
                   <p className="text-sm text-gray-500">7/24 Destek Hattı</p>
                 </div>
               </div>
@@ -99,8 +99,8 @@ export default function Contact() {
                   <h3 className="text-lg font-medium text-gray-900">Adres</h3>
                   <p className="text-gray-600">
                     Mega Oto Tuning<br />
-                    Örnek Mahallesi, Tuning Caddesi No:123<br />
-                    34000 İstanbul, Türkiye
+                    Keban Merkez Sanayi Sitesi, A Blok No: 10<br />
+                    Elazığ, Türkiye
                   </p>
                 </div>
               </div>
